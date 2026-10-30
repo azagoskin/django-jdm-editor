@@ -1,45 +1,68 @@
 @import "@gorules/jdm-editor/dist/style.css";
 
-/* Compact preview panel shown inside the admin form. */
+/* Compact preview card shown inside the admin form. */
 .jdm-preview {
+  max-width: 640px;
+  border: 1px solid var(--hairline-color, #d9d9d9);
+  border-radius: 8px;
+  background: var(--body-bg, #fff);
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.jdm-preview__head {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 6px 0;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hairline-color, #eee);
 }
 
-.jdm-preview__status {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 13px;
-  color: var(--body-quiet-color, #666);
+.jdm-preview__badge {
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
 }
 
-.jdm-preview__names {
-  list-style: decimal;
-  margin: 2px 0;
-  padding-left: 1.6em;
-  color: var(--body-fg, #333);
-  font-weight: 500;
+.jdm-preview__open {
+  margin-left: auto;
 }
 
-.jdm-preview__name {
-  padding: 1px 0;
-}
-
-.jdm-preview__name--more {
+.jdm-preview__list {
   list-style: none;
-  margin-left: -1.6em;
-  font-weight: 400;
+  margin: 0;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--body-fg, #333);
+}
+
+.jdm-preview__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jdm-preview__dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #94a3b8;
+}
+
+.jdm-preview__item--more {
   font-style: italic;
   color: var(--body-quiet-color, #888);
+  padding-left: 18px;
 }
 
-.jdm-preview__counts {
-  font-size: 12px;
-  color: var(--body-quiet-color, #888);
+.jdm-preview__empty {
+  padding: 12px;
+  color: var(--body-quiet-color, #64748b);
 }
 
 .jdm-preview__open,

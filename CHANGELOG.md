@@ -19,6 +19,12 @@ All notable changes to this project are documented here. The format is based on
   monaco / TypeScript lib declarations) that Django tried to resolve as real
   assets. Added a regression test.
 
+### Changed
+- Redesigned the collapsed preview into a card: a "N checks" badge + a list of the
+  decision nodes with a color-coded marker per node type (decision table /
+  expression / function / switch / sub-decision). Graph I/O nodes (Request /
+  Response) are excluded from the list and the count.
+
 ### Added
 - Optional in-editor **Simulator** panel via `JDMWidget(simulate_url=...)`: on run
   the editor POSTs `{graph, context}` (with CSRF) to the given endpoint and renders

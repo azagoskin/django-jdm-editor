@@ -195,34 +195,48 @@ const NODE_TYPE_LABELS: Record<string, string> = {
   decisionNode: "sub-decision",
 };
 
+// Color marker per node type in the preview (graph I/O nodes are not listed).
+const NODE_TYPE_COLORS: Record<string, string> = {
+  decisionTableNode: "#2563eb",
+  expressionNode: "#7c3aed",
+  functionNode: "#ea580c",
+  switchNode: "#9333ea",
+  decisionNode: "#0ea5e9",
+};
+const DEFAULT_NODE_COLOR = "#94a3b8";
+
+// Graph input/output nodes are excluded from the preview — only the actual
+// decision ("check") nodes are shown and counted.
+const IO_NODE_TYPES = new Set(["inputNode", "outputNode"]);
+
 function plural(n: number, one: string, many: string): string {
   return n === 1 ? one : many;
 }
 
-/** Short, informative graph summary for the collapsed panel. */
+type PreviewItem = { name: string; color: string };
+
+/** Short, informative graph summary for the collapsed preview card. */
 function summarize(graph: DecisionGraphType): {
-  names: string[];
+  items: PreviewItem[];
   rest: number;
-  counts: string;
+  count: number;
 } {
   const nodes = Array.isArray(graph.nodes) ? (graph.nodes as Record<string, unknown>[]) : [];
-  const edges = Array.isArray(graph.edges) ? graph.edges : [];
 
-  const allNames = nodes.map((n) => {
-    const name = typeof n?.name === "string" ? n.name.trim() : "";
-    if (name) return name;
+  const checks = nodes.filter(
+    (n) => !IO_NODE_TYPES.has(typeof n?.type === "string" ? n.type : ""),
+  );
+
+  const items: PreviewItem[] = checks.slice(0, 6).map((n) => {
     const type = typeof n?.type === "string" ? n.type : "";
-    return NODE_TYPE_LABELS[type] ?? type ?? "node";
+    const name = typeof n?.name === "string" ? n.name.trim() : "";
+    return {
+      name: name || NODE_TYPE_LABELS[type] || type || "node",
+      color: NODE_TYPE_COLORS[type] ?? DEFAULT_NODE_COLOR,
+    };
   });
 
-  const names = allNames.slice(0, 6);
-  const rest = allNames.length - names.length;
-
-  const counts =
-    `${nodes.length} ${plural(nodes.length, "node", "nodes")}` +
-    `, ${edges.length} ${plural(edges.length, "edge", "edges")}`;
-
-  return { names, rest, counts };
+  return { items, rest: checks.length - items.length, count: checks.length };
 }
 
 function WidgetApp({
@@ -249,41 +263,46 @@ function WidgetApp({
     [input],
   );
 
-  const nodeCount = Array.isArray(graph.nodes) ? graph.nodes.length : 0;
-  const isEmpty = nodeCount === 0;
-  const { names, rest, counts } = summarize(graph);
+  const { items, rest, count } = summarize(graph);
+  const isEmpty = count === 0;
 
   return (
     <>
       <div className="jdm-preview">
-        <span className="jdm-preview__status">
-          {isEmpty ? (
-            <em>Decision graph is empty — click to create</em>
-          ) : (
-            <>
-              <ol className="jdm-preview__names">
-                {names.map((name, i) => (
-                  <li key={i} className="jdm-preview__name">
-                    {name}
-                  </li>
-                ))}
-                {rest > 0 && (
-                  <li className="jdm-preview__name jdm-preview__name--more">
-                    …and {rest} more
-                  </li>
-                )}
-              </ol>
-              <span className="jdm-preview__counts">{counts}</span>
-            </>
-          )}
-        </span>
-        <button
-          type="button"
-          className="jdm-preview__open"
-          onClick={() => setOpen(true)}
-        >
-          {disabled ? "Open (read-only)" : "Open editor"} ⛶
-        </button>
+        <div className="jdm-preview__head">
+          <span className="jdm-preview__badge">
+            {count} {plural(count, "check", "checks")}
+          </span>
+          <button
+            type="button"
+            className="jdm-preview__open"
+            onClick={() => setOpen(true)}
+          >
+            {disabled ? "Open (read-only)" : "Open editor"} ⛶
+          </button>
+        </div>
+        {isEmpty ? (
+          <div className="jdm-preview__empty">
+            No checks yet — click “Open editor” to add.
+          </div>
+        ) : (
+          <ul className="jdm-preview__list">
+            {items.map((item, i) => (
+              <li key={i} className="jdm-preview__item">
+                <span
+                  className="jdm-preview__dot"
+                  style={{ background: item.color }}
+                />
+                {item.name}
+              </li>
+            ))}
+            {rest > 0 && (
+              <li className="jdm-preview__item jdm-preview__item--more">
+                …and {rest} more
+              </li>
+            )}
+          </ul>
+        )}
       </div>
       {open && (
         <Overlay
