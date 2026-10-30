@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Fixed
+- Editor popups (the upload/download menus, node-type selects, hit-policy
+  dropdowns, tooltips, context menus) opened *behind* the fullscreen overlay and
+  looked broken/unclickable: the overlay's high `z-index` covered Ant Design
+  popups rendered into `<body>`. The editor is now wrapped in an Ant Design
+  `ConfigProvider` with `getPopupContainer` pointing inside the overlay, so popups
+  stack above the editor and are usable.
+
 - `collectstatic` under `ManifestStaticFilesStorage` (e.g. WhiteNoise's
   `CompressedManifestStaticFilesStorage`) no longer fails: the build now strips
   stray `//# sourceMappingURL=*.d.ts.map` comment lines (embedded by bundled

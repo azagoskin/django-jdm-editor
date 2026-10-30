@@ -1,7 +1,8 @@
-import { StrictMode, useCallback, useEffect, useState } from "react";
+import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { DecisionGraph, JdmConfigProvider } from "@gorules/jdm-editor";
+import { ConfigProvider } from "antd";
 import "./styles.css";
 
 type DecisionGraphType = {
@@ -49,6 +50,8 @@ function Overlay({
   onChange: (g: DecisionGraphType) => void;
   onClose: () => void;
 }) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+
   // Close on Escape and lock background scroll while the overlay is open.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -64,7 +67,7 @@ function Overlay({
   }, [onClose]);
 
   return createPortal(
-    <div className="jdm-overlay" role="dialog" aria-modal="true">
+    <div className="jdm-overlay" role="dialog" aria-modal="true" ref={overlayRef}>
       <div className="jdm-overlay__bar">
         <span className="jdm-overlay__title">
           Decision editor{disabled ? " (read-only)" : ""}
@@ -74,12 +77,18 @@ function Overlay({
         </button>
       </div>
       <div className="jdm-overlay__canvas">
+        {/* Render antd popups (dropdowns, selects, tooltips, menus) INSIDE the
+            overlay so they stack above the editor instead of behind this
+            fullscreen layer — otherwise the editor's upload/download menus and
+            all other popups open underneath and look broken. */}
         <JdmConfigProvider>
-          <DecisionGraph
-            value={graph as never}
-            onChange={(g) => onChange(g as DecisionGraphType)}
-            disabled={disabled}
-          />
+          <ConfigProvider getPopupContainer={() => overlayRef.current ?? document.body}>
+            <DecisionGraph
+              value={graph as never}
+              onChange={(g) => onChange(g as DecisionGraphType)}
+              disabled={disabled}
+            />
+          </ConfigProvider>
         </JdmConfigProvider>
       </div>
     </div>,
