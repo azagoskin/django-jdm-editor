@@ -68,6 +68,27 @@ class PolicyAdmin(admin.ModelAdmin):
     }
 ```
 
+## Simulation (optional)
+
+Pass `simulate_url` to the widget to enable the in-editor **Simulator** panel.
+On run, the editor POSTs `{"graph": ..., "context": ...}` to that URL (with the
+`X-CSRFToken` header) and shows the result/trace:
+
+```python
+from django.urls import reverse_lazy
+from django_jdm_editor.widgets import JDMWidget
+
+class PolicyAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        JSONField: {"widget": JDMWidget(simulate_url=reverse_lazy("my-simulate-view"))},
+    }
+```
+
+Your view receives `{"graph", "context"}` and should return
+`{"performance", "result", "trace"}` on success, or `{"error": {"message": ...}}`.
+Evaluate the graph however you like — e.g. with [`zen-engine`](https://pypi.org/project/zen-engine/).
+Without `simulate_url`, no simulation UI is shown.
+
 ## How it works
 
 The widget renders a hidden `<input>` holding the JDM JSON plus a

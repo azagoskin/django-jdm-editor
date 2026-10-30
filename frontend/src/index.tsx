@@ -1,8 +1,21 @@
-import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
+import {
+  StrictMode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
-import { DecisionGraph, JdmConfigProvider } from "@gorules/jdm-editor";
+import {
+  DecisionGraph,
+  GraphSimulator,
+  JdmConfigProvider,
+  type Simulation,
+} from "@gorules/jdm-editor";
 import { ConfigProvider } from "antd";
+import { PlayCircleOutlined } from "@ant-design/icons";
 import "./styles.css";
 
 type DecisionGraphType = {
@@ -39,18 +52,88 @@ function parseInitial(input: InputEl): DecisionGraphType {
   return EMPTY_GRAPH;
 }
 
+function getCookie(name: string): string {
+  const match = document.cookie.match(
+    new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1") + "=([^;]*)"),
+  );
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
 function Overlay({
   graph,
   disabled,
+  simulateUrl,
   onChange,
   onClose,
 }: {
   graph: DecisionGraphType;
   disabled: boolean;
+  simulateUrl: string;
   onChange: (g: DecisionGraphType) => void;
   onClose: () => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [simulation, setSimulation] = useState<Simulation | undefined>(undefined);
+
+  // POST {graph, context} to the configured endpoint and feed the result back
+  // into the editor's Simulator panel. Expects {performance, result, trace} on
+  // success, or an {error: {...}} payload.
+  const handleRun = useCallback(
+    async ({ context }: { graph: unknown; context: unknown }) => {
+      try {
+        const resp = await fetch(simulateUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({ graph, context }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || data?.error) {
+          setSimulation({
+            error: {
+              message: data?.error?.message ?? data?.detail ?? `HTTP ${resp.status}`,
+              data: data?.error?.data ?? {},
+            },
+          });
+          return;
+        }
+        setSimulation({
+          result: {
+            performance: data.performance ?? "",
+            result: data.result,
+            snapshot: graph as never,
+            trace: data.trace ?? {},
+          },
+        });
+      } catch (err) {
+        setSimulation({
+          error: { message: String(err), data: {} },
+        });
+      }
+    },
+    [simulateUrl],
+  );
+
+  const panels = useMemo(() => {
+    if (!simulateUrl) return undefined;
+    return [
+      {
+        id: "simulator",
+        title: "Simulator",
+        icon: <PlayCircleOutlined />,
+        renderPanel: () => (
+          <GraphSimulator
+            onRun={handleRun}
+            onClear={() => setSimulation(undefined)}
+          />
+        ),
+      },
+    ];
+  }, [simulateUrl, handleRun]);
 
   // Close on Escape and lock background scroll while the overlay is open.
   useEffect(() => {
@@ -85,8 +168,13 @@ function Overlay({
           <ConfigProvider getPopupContainer={() => overlayRef.current ?? document.body}>
             <DecisionGraph
               value={graph as never}
-              onChange={(g) => onChange(g as DecisionGraphType)}
+              onChange={(g) => {
+                setSimulation(undefined);
+                onChange(g as DecisionGraphType);
+              }}
               disabled={disabled}
+              panels={panels}
+              simulate={simulation}
             />
           </ConfigProvider>
         </JdmConfigProvider>
@@ -141,10 +229,12 @@ function WidgetApp({
   input,
   initial,
   disabled,
+  simulateUrl,
 }: {
   input: InputEl;
   initial: DecisionGraphType;
   disabled: boolean;
+  simulateUrl: string;
 }) {
   const [graph, setGraph] = useState<DecisionGraphType>(initial);
   const [open, setOpen] = useState(false);
@@ -199,6 +289,7 @@ function WidgetApp({
         <Overlay
           graph={graph}
           disabled={disabled}
+          simulateUrl={simulateUrl}
           onChange={handleChange}
           onClose={() => setOpen(false)}
         />
@@ -223,13 +314,19 @@ function mount(el: HTMLElement) {
   }
 
   const disabled = el.dataset.disabled === "true";
+  const simulateUrl = el.dataset.simulateUrl ?? "";
   const initial = parseInitial(input);
 
   const root = createRoot(el);
   mounted.set(el, root);
   root.render(
     <StrictMode>
-      <WidgetApp input={input} initial={initial} disabled={disabled} />
+      <WidgetApp
+        input={input}
+        initial={initial}
+        disabled={disabled}
+        simulateUrl={simulateUrl}
+      />
     </StrictMode>,
   );
 }

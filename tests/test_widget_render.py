@@ -30,3 +30,15 @@ def test_disabled_flag_propagates():
     widget = JDMWidget()
     html = widget.render("decision", "", attrs={"id": "id_decision", "disabled": True})
     assert 'data-disabled="true"' in html
+
+
+def test_simulate_url_rendered_when_set():
+    widget = JDMWidget(simulate_url="/admin/jdm/simulate/")
+    html = widget.render("decision", "", attrs={"id": "id_decision"})
+    assert 'data-simulate-url="/admin/jdm/simulate/"' in html
+
+
+def test_no_simulate_url_attribute_by_default():
+    widget = JDMWidget()
+    html = widget.render("decision", "", attrs={"id": "id_decision"})
+    assert "data-simulate-url" not in html

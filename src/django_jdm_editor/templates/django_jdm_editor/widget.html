@@ -7,5 +7,6 @@
   <div data-jdm-editor
        id="{{ widget.attrs.id }}"
        data-input-id="{{ widget.input_id }}"
-       data-disabled="{{ widget.disabled|yesno:'true,false' }}"></div>
+       data-disabled="{{ widget.disabled|yesno:'true,false' }}"
+       {% if widget.simulate_url %}data-simulate-url="{{ widget.simulate_url }}"{% endif %}></div>
 </div>

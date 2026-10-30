@@ -20,6 +20,10 @@ All notable changes to this project are documented here. The format is based on
   assets. Added a regression test.
 
 ### Added
+- Optional in-editor **Simulator** panel via `JDMWidget(simulate_url=...)`: on run
+  the editor POSTs `{graph, context}` (with CSRF) to the given endpoint and renders
+  the `{performance, result, trace}` response (or `{error}`). No simulation UI is
+  shown when `simulate_url` is unset.
 - Initial MVP: `JDMField` model field, `JDMFormField` / `JDMWidget` form widgets
   mounting the GoRules `@gorules/jdm-editor` `DecisionGraph` in the Django admin.
 - Self-contained IIFE JS bundle (React inlined) built with Vite; no Node required
