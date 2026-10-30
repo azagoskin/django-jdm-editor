@@ -30,3 +30,12 @@ def test_bundle_contains_editor_bootstrap():
     # Our entry-point selector/boot markers survive minification.
     assert "data-jdm-editor" in content
     assert "formset:added" in content
+
+
+@pytest.mark.skipif(not bundle_built, reason="JS bundle not built (run `npm run build`)")
+def test_bundle_has_no_sourcemap_comment_lines():
+    # Django's ManifestStaticFilesStorage treats any standalone
+    # `//# sourceMappingURL=` line as a real asset reference and fails
+    # collectstatic if the target .map is missing. The build strips these.
+    for line in JS.read_text(encoding="utf-8", errors="ignore").splitlines():
+        assert not line.startswith("//# sourceMappingURL="), line

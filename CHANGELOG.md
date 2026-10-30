@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+- `collectstatic` under `ManifestStaticFilesStorage` (e.g. WhiteNoise's
+  `CompressedManifestStaticFilesStorage`) no longer fails: the build now strips
+  stray `//# sourceMappingURL=*.d.ts.map` comment lines (embedded by bundled
+  monaco / TypeScript lib declarations) that Django tried to resolve as real
+  assets. Added a regression test.
+
 ### Added
 - Initial MVP: `JDMField` model field, `JDMFormField` / `JDMWidget` form widgets
   mounting the GoRules `@gorules/jdm-editor` `DecisionGraph` in the Django admin.
