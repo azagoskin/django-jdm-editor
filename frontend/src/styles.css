@@ -1,0 +1,99 @@
+@import "@gorules/jdm-editor/dist/style.css";
+
+/* Compact preview panel shown inside the admin form. */
+.jdm-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+
+.jdm-preview__status {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--body-quiet-color, #666);
+}
+
+.jdm-preview__names {
+  list-style: decimal;
+  margin: 2px 0;
+  padding-left: 1.6em;
+  color: var(--body-fg, #333);
+  font-weight: 500;
+}
+
+.jdm-preview__name {
+  padding: 1px 0;
+}
+
+.jdm-preview__name--more {
+  list-style: none;
+  margin-left: -1.6em;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--body-quiet-color, #888);
+}
+
+.jdm-preview__counts {
+  font-size: 12px;
+  color: var(--body-quiet-color, #888);
+}
+
+.jdm-preview__open,
+.jdm-overlay__done {
+  cursor: pointer;
+  border: 1px solid var(--border-color, #0c4b33);
+  background: var(--button-bg, #417690);
+  color: var(--button-fg, #fff);
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.jdm-preview__open:hover,
+.jdm-overlay__done:hover {
+  background: var(--button-hover-bg, #205067);
+}
+
+/* Fullscreen editor overlay (rendered via a portal into <body>). */
+.jdm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  background: var(--body-bg, #fff);
+}
+
+.jdm-overlay__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--hairline-color, #e0e0e0);
+  background: var(--darkened-bg, #f8f8f8);
+}
+
+.jdm-overlay__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--body-fg, #333);
+}
+
+.jdm-overlay__canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+/* The editor must fill the full height of the overlay. */
+.jdm-overlay__canvas > div,
+.jdm-overlay__canvas .grl-dg {
+  height: 100%;
+  min-height: 0;
+}

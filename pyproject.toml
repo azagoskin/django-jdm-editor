@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-jdm-editor"
+dynamic = ["version"]
+description = "Django admin widget for editing GoRules JDM (JSON Decision Model) decision graphs."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Andrey Zagoskin" }]
+keywords = ["django", "jdm", "gorules", "decision", "admin", "widget", "json"]
+dependencies = ["Django>=4.2"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+# Phase 2: server-side simulation via zen-engine.
+simulation = ["zen-engine>=0.30"]
+dev = ["pytest", "pytest-django", "build", "twine"]
+
+[project.urls]
+Homepage = "https://github.com/azagoskin/django-jdm-editor"
+Source = "https://github.com/azagoskin/django-jdm-editor"
+Issues = "https://github.com/azagoskin/django-jdm-editor/issues"
+
+[tool.hatch.version]
+path = "src/django_jdm_editor/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/django_jdm_editor"]
+artifacts = [
+    "src/django_jdm_editor/static/**/*.js",
+    "src/django_jdm_editor/static/**/*.css",
+]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+# Verifies (and, if Node is available, builds) the JS bundle before packing.
+path = "hatch_build.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/django_jdm_editor",
+    "frontend",
+    "tests",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "hatch_build.py",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+pythonpath = ["."]

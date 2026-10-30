@@ -1,0 +1,6 @@
+# Variant A: the bundle is built in CI at release time and packed into the wheel;
+# it is NOT committed to git. See PLAN.md §9 to switch to variant B.
+jdm-editor.js
+jdm-editor.css
+jdm-editor.js.map
+assets/

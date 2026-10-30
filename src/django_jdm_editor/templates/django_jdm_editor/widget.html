@@ -1,0 +1,11 @@
+<div class="jdm-editor-wrapper">
+  <input type="hidden"
+         name="{{ widget.name }}"
+         id="{{ widget.input_id }}"
+         value="{{ widget.value|default:'' }}"
+         {% if widget.disabled %}disabled{% endif %}>
+  <div data-jdm-editor
+       id="{{ widget.attrs.id }}"
+       data-input-id="{{ widget.input_id }}"
+       data-disabled="{{ widget.disabled|yesno:'true,false' }}"></div>
+</div>
