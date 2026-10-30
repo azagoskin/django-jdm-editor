@@ -3,7 +3,15 @@
 All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [0.1.1]
+
+### Fixed
+- License: the `LICENSE` file shipped the GPLv3 text while the package metadata,
+  README and intent were MIT. Replaced `LICENSE` with the MIT text so the license
+  is consistent everywhere (the project is MIT, matching its MIT-licensed bundled
+  dependencies). 0.1.0 on PyPI carried the mismatched file; use 0.1.1.
+
+## [0.1.0]
 
 ### Fixed
 - Editor popups (the upload/download menus, node-type selects, hit-policy
