@@ -3,6 +3,15 @@
 All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.2]
+
+### Changed
+- Docs: README now documents the preview card (per-type color markers, I/O
+  excluded) and the optional Simulator; refreshed the preview screenshot.
+- CI: bumped GitHub Actions to the Node 24 runtime (checkout v5, setup-node v5,
+  setup-python v6, upload/download-artifact v5; build Node 22) to silence the
+  Node 20 deprecation warning.
+
 ## [0.1.1]
 
 ### Fixed
