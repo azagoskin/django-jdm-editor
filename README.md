@@ -9,9 +9,18 @@ visual decision-graph editor.
 **End users don't need Node/npm** — the editor's JavaScript bundle ships pre-built
 inside the wheel.
 
+## Features
+
+- **Full visual editing** of JDM decision graphs in the Django admin (not read-only).
+- **Compact preview card** on the change form: a "N checks" badge plus the decision
+  nodes with a color-coded marker per node type (graph I/O nodes are excluded).
+- **Fullscreen overlay editor** opened from the card; saved with the normal form Save.
+- **Optional in-editor Simulator** wired to your own endpoint (see below).
+- Self-contained bundle (React inlined, no CDN, CSP/offline friendly).
+
 ## Screenshots
 
-A compact summary panel sits in the admin form; clicking **Open editor** expands the
+A compact preview card sits in the admin form; clicking **Open editor** expands the
 full `DecisionGraph` to a fullscreen overlay:
 
 ![The widget inside a Django admin change form](https://raw.githubusercontent.com/azagoskin/django-jdm-editor/main/docs/img/admin-form.png)
@@ -92,11 +101,18 @@ Without `simulate_url`, no simulation UI is shown.
 ## How it works
 
 The widget renders a hidden `<input>` holding the JDM JSON plus a
-`<div data-jdm-editor>` container. The bundled JS reads the initial JSON, mounts a
-`DecisionGraph`, and writes changes back into the hidden input — so the value
-travels with the form like any other field. React is inlined into the bundle, so
-it never clashes with other React on the page and needs no importmap. No external
-CDNs are contacted (CSP/offline friendly).
+`<div data-jdm-editor>` container. The bundled JS reads the initial JSON and renders
+a compact **preview card** — a "N checks" badge and the decision nodes, each with a
+color-coded marker by node type (`decisionTableNode`, `expressionNode`,
+`functionNode`, `switchNode`, …); graph I/O nodes (Request/Response) are excluded
+from both the list and the count.
+
+Clicking **Open editor** mounts the full `DecisionGraph` in a fullscreen overlay
+(with the optional Simulator panel). On change the JS writes the updated JSON back
+into the hidden input — so the value travels with the form like any other field and
+is persisted by the normal admin Save. React is inlined into the bundle, so it never
+clashes with other React on the page and needs no importmap. No external CDNs are
+contacted (CSP/offline friendly).
 
 Run `collectstatic` as usual to serve the assets.
 
